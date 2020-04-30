@@ -1,0 +1,6 @@
+Step 1: use dirbuster on the given url which reveals that url/sercet contains a wordpress blog
+Step 2: use wpscan to look for vulnerabilities in the wordpress blog
+Step 3: We see that wpscan reports a vulnerable extension named grace media player and we search for its vulnerabilities
+Step 4: I come across https://www.exploit-db.com/exploits/46537 and use it to send a get request for the ~/etc/passwd file
+Step 4: Then I send a get request for home/ctctf/flag.txt
+FLAG : CTCTF{Vuln3r4ble_WP_Plug1n_2020}
